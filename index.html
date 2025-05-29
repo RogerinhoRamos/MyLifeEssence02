@@ -68,15 +68,116 @@
             max-width: 1400px;
             margin: 0 auto;
         }
+		
+		
+		
+		
+		
 
         .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }
+			display: flex;
+			align-items: center;
+			gap: 15px;
+			text-decoration: none;
+			transition: all 0.3s ease;
+		}
+
+		.logo-rr {
+			font-size: 1.8rem;
+			font-weight: 800;
+			background: linear-gradient(45deg, var(--primary), var(--secondary));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+		}
+
+		.logo-nome {
+			font-size: 1.6rem;
+			font-weight: 500;
+			font-family: 'Brush Script MT', cursive;
+			background: linear-gradient(45deg, var(--primary), var(--secondary), var(--gold));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			text-shadow: 1px 1px 2px rgba(0, 212, 255, 0.3);
+			position: relative;
+			transform: rotate(-1deg);
+		}
+
+		.logo-nome::before {
+			content: '✦';
+			position: absolute;
+			left: -25px;
+			top: 50%;
+			transform: translateY(-50%);
+			font-size: 1.2rem;
+			animation: twinkle 2s infinite;
+		}
+
+		.logo-nome::after {
+			content: '';
+			position: absolute;
+			bottom: -6px;
+			left: 5%;
+			width: 90%;
+			height: 2px;
+			background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+			border-radius: 1px;
+			opacity: 0.7;
+		}
+
+		@keyframes twinkle {
+			0%, 100% { 
+				opacity: 1; 
+				transform: translateY(-50%) scale(1);
+				color: var(--primary);
+			}
+			25% { 
+				opacity: 0.4; 
+				transform: translateY(-50%) scale(1.2);
+				color: var(--secondary);
+			}
+			50% { 
+				opacity: 0.7; 
+				transform: translateY(-50%) scale(1.1);
+				color: var(--gold);
+			}
+			75% { 
+				opacity: 1; 
+				transform: translateY(-50%) scale(1);
+				color: var(--accent);
+			}
+		}
+
+		.logo:hover .logo-nome {
+			transform: rotate(-1deg) scale(1.05);
+		}
+
+		.logo:hover .logo-rr {
+			transform: scale(1.05);
+		}
+
+		@media (max-width: 768px) {
+			.logo {
+				gap: 10px;
+			}
+			.logo-nome {
+				font-size: 1.3rem;
+			}
+			.logo-nome::before {
+				left: -20px;
+				font-size: 1rem;
+			}
+			.logo-rr {
+				font-size: 1.5rem;
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
 
         .nav-links {
             display: flex;
@@ -985,7 +1086,10 @@
     <!-- Header -->
     <header class="header" id="header">
         <nav class="nav">
-            <a href="#home" class="logo">RR</a>
+            <a href="#home" class="logo">
+				<span class="logo-rr">RR</span>
+				<span class="logo-nome">Rogerinho Ramos</span>
+			</a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#home">Início</a></li>
                 <li><a href="#vision">Visão</a></li>
