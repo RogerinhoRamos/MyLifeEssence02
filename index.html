@@ -1080,10 +1080,8 @@
     </style>
 </head>
 <body>
-    <!-- Progress Bar -->
     <div class="progress-bar" id="progressBar"></div>
 
-    <!-- Header -->
     <header class="header" id="header">
         <nav class="nav">
             <a href="#home" class="logo">
@@ -1094,7 +1092,7 @@
                 <li><a href="#home">Início</a></li>
                 <li><a href="#vision">Visão</a></li>
                 <li><a href="#ecosystems">Ecossistemas</a></li>
-                <li><a href="#projects">Projetos</a></li>
+                <li><a href="#calculator">Calculadora CNC</a></li> <li><a href="#projects">Projetos</a></li>
                 <li><a href="#contact">Contato</a></li>
             </ul>
             <div class="mobile-menu-toggle" id="mobileMenuToggle">
@@ -1105,7 +1103,6 @@
         </nav>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-container">
             <div class="hero-content">
@@ -1152,7 +1149,6 @@
         </div>
     </section>
 
-    <!-- Visão Integrada -->
     <section class="section" id="vision">
         <h2 class="section-title">Visão Integrada</h2>
         <p class="section-subtitle">Conectando tecnologia, inovação e propósito em um ecossistema único</p>
@@ -1197,7 +1193,6 @@
             </div>
         </div>
 
-        <!-- Resultados & Impacto -->
         <div class="results-section">
             <h3 style="color: var(--gold); margin-bottom: 3rem; font-size: 1.8rem; text-align: center;">Resultados & Impacto</h3>
             <div class="results-grid">
@@ -1221,13 +1216,11 @@
         </div>
     </section>
 
-    <!-- Ecosystems Section -->
     <section class="section ecosystems" id="ecosystems">
         <h2 class="section-title">Ecossistemas de Soluções</h2>
         <p class="section-subtitle">Quatro frentes integradas para transformação completa</p>
         
         <div class="ecosystem-grid">
-            <!-- CNC & Usinagem -->
             <div class="ecosystem-card cnc">
                 <div class="ecosystem-icon">
                     <i class="fas fa-cogs"></i>
@@ -1246,7 +1239,6 @@
                 </ul>
             </div>
 
-            <!-- Inovações Tecnológicas -->
             <div class="ecosystem-card tech">
                 <div class="ecosystem-icon">
                     <i class="fas fa-laptop-code"></i>
@@ -1265,7 +1257,6 @@
                 </ul>
             </div>
 
-            <!-- Mundo dos Investimentos -->
             <div class="ecosystem-card invest">
                 <div class="ecosystem-icon">
                     <i class="fas fa-chart-line"></i>
@@ -1284,7 +1275,6 @@
                 </ul>
             </div>
 
-            <!-- Espiritualidade & Propósito -->
             <div class="ecosystem-card spirit">
                 <div class="ecosystem-icon">
                     <i class="fas fa-heart"></i>
@@ -1305,7 +1295,127 @@
         </div>
     </section>
 
-    <!-- Projetos em Destaque -->
+    <section class="section" id="calculator">
+        <h2 class="section-title">Calculadora de Rugosidade Superficial</h2>
+        <p class="section-subtitle">Use esta ferramenta para calcular a rugosidade superficial teórica, tanto pela fórmula padrão quanto pela adaptada.</p>
+        
+        <div class="calculator-container" style="
+            max-width: 800px; 
+            margin: auto; 
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        ">
+            <div class="mode-selector" style="
+                display: flex;
+                justify-content: center;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+                gap: 10px;
+            ">
+                <button id="modeRaBtn" class="active" onclick="setMode('ra')" style="
+                    background: transparent;
+                    color: var(--white);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    padding: 10px 15px;
+                    cursor: pointer;
+                    border-radius: 50px;
+                    transition: all 0.3s ease;
+                ">
+                    Calcular Rugosidade ($Ra$)
+                </button>
+                <button id="modeFeedBtn" onclick="setMode('feed')" style="
+                    background: transparent;
+                    color: var(--white);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    padding: 10px 15px;
+                    cursor: pointer;
+                    border-radius: 50px;
+                    transition: all 0.3s ease;
+                ">
+                    Calcular Avanço ($f$)
+                </button>
+            </div>
+
+            <div id="calculator-inputs">
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label for="inputRa" id="labelRa" style="display: block; margin-bottom: 5px; font-weight: bold;">Rugosidade ($Ra$) em µm:</label>
+                    <input type="number" id="inputRa" placeholder="Ex: 3.2" step="any" disabled style="
+                        width: calc(100% - 22px);
+                        padding: 10px;
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        border-radius: 10px;
+                        background: rgba(255, 255, 255, 0.05);
+                        color: var(--white);
+                    ">
+                </div>
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label for="inputFeed" id="labelFeed" style="display: block; margin-bottom: 5px; font-weight: bold;">Avanço ($f$) em mm/rot:</label>
+                    <input type="number" id="inputFeed" placeholder="Ex: 0.22" step="any" style="
+                        width: calc(100% - 22px);
+                        padding: 10px;
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        border-radius: 10px;
+                        background: rgba(255, 255, 255, 0.05);
+                        color: var(--white);
+                    ">
+                </div>
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label for="inputRadius" id="labelRadius" style="display: block; margin-bottom: 5px; font-weight: bold;">Raio do Inserto ($r$) em mm:</label>
+                    <input type="number" id="inputRadius" placeholder="Ex: 0.8" step="any" style="
+                        width: calc(100% - 22px);
+                        padding: 10px;
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        border-radius: 10px;
+                        background: rgba(255, 255, 255, 0.05);
+                        color: var(--white);
+                    ">
+                </div>
+            </div>
+
+            <div class="results" style="
+                display: flex;
+                justify-content: space-around;
+                margin-top: 30px;
+                flex-wrap: wrap;
+                gap: 20px;
+            ">
+                <div class="result-box" style="
+                    flex: 1;
+                    min-width: 300px;
+                    padding: 20px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 8px;
+                    text-align: center;
+                    background: rgba(255, 255, 255, 0.05);
+                ">
+                    <h3 style="margin-top: 0; color: var(--primary);">Fórmula Teórica Padrão</h3>
+                    <p style="color: var(--text-light);">Ra = f² / (8 * r)</p>
+                    <p class="result-value" id="resultPadrão" style="font-size: 2em; font-weight: bold; margin: 10px 0; color: var(--white);"></p>
+                    <p class="formula" style="font-style: italic; margin-top: 10px; color: var(--text-light);">Calcula a rugosidade ideal em condições perfeitas.</p>
+                </div>
+                <div class="result-box" style="
+                    flex: 1;
+                    min-width: 300px;
+                    padding: 20px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 8px;
+                    text-align: center;
+                    background: rgba(255, 255, 255, 0.05);
+                ">
+                    <h3 style="margin-top: 0; color: var(--primary);">Fórmula Adaptada</h3>
+                    <p style="color: var(--text-light);">Ra = 50 * f² / r</p>
+                    <p class="result-value" id="resultAdaptada" style="font-size: 2em; font-weight: bold; margin: 10px 0; color: var(--white);"></p>
+                    <p class="formula" style="font-style: italic; margin-top: 10px; color: var(--text-light);">A constante 50 compensa fatores práticos, aproximando do valor real.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="section" id="projects">
         <h2 class="section-title">Projetos em Destaque</h2>
         <p class="section-subtitle">Conheça os principais projetos de cada ecossistema</p>
@@ -1328,7 +1438,6 @@
                 </div>
 
                 <div class="carousel-content">
-                    <!-- CNC Video -->
                     <div id="cnc-slide" class="video-slide active">
                         <div class="video-thumbnail" onclick="openLink('https://youtube.com/playlist?list=PLH1qveNkEryyGlXs6B2NrcsLSY94yoOQn&si=UZGA9qVpeuN2nJKH')">
                             <img src="https://img.youtube.com/vi/kq50lKWBT_I/hqdefault.jpg" alt="CNC & Usinagem" 
@@ -1349,7 +1458,6 @@
                         </div>
                     </div>
 
-                    <!-- Tech Video -->
                     <div id="tech-slide" class="video-slide">
                         <div class="video-thumbnail" onclick="playVideo('https://youtu.be/J8QqrqzMfjw?si=QVoS7WnuRtkvErNt')">
                             <img src="https://img.youtube.com/vi/J8QqrqzMfjw/hqdefault.jpg" alt="Inovação Tecnológica"
@@ -1370,7 +1478,6 @@
                         </div>
                     </div>
 
-                    <!-- Investment Video - CORRIGIDO -->
                     <div id="invest-slide" class="video-slide">
                         <div class="video-thumbnail" onclick="playVideo('https://youtu.be/cHwJnyj-5Vs?si=spZom9bM9T5KNJGV')">
                             <img src="https://img.youtube.com/vi/cHwJnyj-5Vs/hqdefault.jpg" alt="Mundo dos Investimentos"
@@ -1391,7 +1498,6 @@
                         </div>
                     </div>
 
-                    <!-- Spirit Video -->
                     <div id="spirit-slide" class="video-slide">
                         <div class="video-thumbnail" onclick="playVideo('https://youtube.com/shorts/b2msJeTtVd4?si=FQSu_OhYLA8rnRJ2')">
                             <img src="https://img.youtube.com/vi/b2msJeTtVd4/hqdefault.jpg" alt="Espiritualidade Redentiva"
@@ -1416,13 +1522,11 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
     <section class="section contact" id="contact">
         <h2 class="section-title">Vamos Conversar?</h2>
         <p class="section-subtitle">Pronto para transformar seus desafios em oportunidades</p>
         
         <div class="contact-container">
-            <!-- Entre em Contato -->
             <div class="contact-box">
                 <h3 style="color: var(--primary); margin-bottom: 2rem; font-size: 1.5rem;">Entre em Contato</h3>
                 <p style="color: var(--text-light); margin-bottom: 3rem; line-height: 1.8;">
@@ -1445,11 +1549,9 @@
                 </div>
             </div>
             
-            <!-- Envie uma Mensagem -->
             <div class="contact-box">
                 <h3 style="color: var(--primary); margin-bottom: 2rem;">Envie uma Mensagem</h3>
                 
-                <!-- Status da mensagem -->
                 <div id="form-status" class="form-status"></div>
                 
                 <form class="contact-form" id="contactForm">
@@ -1473,7 +1575,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <p>&copy; 2025 Rogério Costa Ramos. Transformação Digital com Propósito</p>
         
@@ -1820,6 +1921,94 @@
                 }
             }, 1000);
         });
+
+        // Novo script da calculadora
+        const inputRa = document.getElementById('inputRa');
+        const inputFeed = document.getElementById('inputFeed');
+        const inputRadius = document.getElementById('inputRadius');
+        const resultPadrão = document.getElementById('resultPadrão');
+        const resultAdaptada = document.getElementById('resultAdaptada');
+        const modeRaBtn = document.getElementById('modeRaBtn');
+        const modeFeedBtn = document.getElementById('modeFeedBtn');
+
+        let mode = 'ra';
+
+        function setMode(newMode) {
+            mode = newMode;
+            if (mode === 'ra') {
+                inputRa.disabled = true;
+                inputFeed.disabled = false;
+                modeRaBtn.classList.add('active');
+                modeFeedBtn.classList.remove('active');
+                document.getElementById('labelRa').style.color = 'var(--text-light)';
+                document.getElementById('labelFeed').style.color = 'var(--primary)';
+                inputRa.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                inputFeed.style.border = '1px solid var(--primary)';
+                modeRaBtn.style.borderColor = 'var(--primary)';
+                modeRaBtn.style.color = 'var(--primary)';
+                modeFeedBtn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                modeFeedBtn.style.color = 'var(--white)';
+            } else {
+                inputRa.disabled = false;
+                inputFeed.disabled = true;
+                modeRaBtn.classList.remove('active');
+                modeFeedBtn.classList.add('active');
+                document.getElementById('labelRa').style.color = 'var(--primary)';
+                document.getElementById('labelFeed').style.color = 'var(--text-light)';
+                inputRa.style.border = '1px solid var(--primary)';
+                inputFeed.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                modeRaBtn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                modeRaBtn.style.color = 'var(--white)';
+                modeFeedBtn.style.borderColor = 'var(--primary)';
+                modeFeedBtn.style.color = 'var(--primary)';
+            }
+            calculate();
+        }
+
+        function calculate() {
+            const r = parseFloat(inputRadius.value);
+
+            if (isNaN(r) || r <= 0) {
+                resultPadrão.textContent = 'Dados Inválidos';
+                resultAdaptada.textContent = 'Dados Inválidos';
+                return;
+            }
+
+            if (mode === 'ra') {
+                const f = parseFloat(inputFeed.value);
+                if (isNaN(f)) {
+                    resultPadrão.textContent = '';
+                    resultAdaptada.textContent = '';
+                    return;
+                }
+
+                const raPadrão = (f * f) / (8 * r);
+                resultPadrão.textContent = raPadrão.toFixed(4) + ' µm';
+
+                const raAdaptada = (50 * f * f) / r;
+                resultAdaptada.textContent = raAdaptada.toFixed(4) + ' µm';
+
+            } else if (mode === 'feed') {
+                const ra = parseFloat(inputRa.value);
+                if (isNaN(ra) || ra <= 0) {
+                    resultPadrão.textContent = '';
+                    resultAdaptada.textContent = '';
+                    return;
+                }
+
+                const fPadrão = Math.sqrt(ra * 8 * r);
+                resultPadrão.textContent = fPadrão.toFixed(4) + ' mm/rot';
+
+                const fAdaptada = Math.sqrt((ra * r) / 50);
+                resultAdaptada.textContent = fAdaptada.toFixed(4) + ' mm/rot';
+            }
+        }
+
+        inputRa.addEventListener('input', calculate);
+        inputFeed.addEventListener('input', calculate);
+        inputRadius.addEventListener('input', calculate);
+
+        setMode('ra');
     </script>
 </body>
 </html>
