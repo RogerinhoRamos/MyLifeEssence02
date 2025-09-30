@@ -49,6 +49,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .header-nav .tab-btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
         }
 
         .logo {
@@ -148,46 +161,7 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 5%;
-        }
-
-        .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 50%, var(--secondary) 100%);
-            border-radius: 20px;
-            padding: 1.5rem 3rem;
-            margin: 0 auto 2rem;
-            text-align: center;
-            max-width: 900px;
-        }
-
-        .hero h1 {
-            font-size: 2.2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .hero-subtitle {
-            font-size: 1.05rem;
-            opacity: 0.95;
-            margin-bottom: 0.8rem;
-        }
-
-        .hero-warning {
-            font-size: 0.85rem;
-            opacity: 0.85;
-            line-height: 1.5;
-        }
-
-        .tabs {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
+            padding: 1rem 5%;
         }
 
         .tab-btn {
@@ -409,40 +383,30 @@
                 <span class="logo-rr">RR</span>
                 <span class="logo-nome">Rogerinho Ramos</span>
             </a>
+            
+            <div class="header-nav">
+                <button class="tab-btn active" onclick="showTab('simulador')">
+                    <i class="fas fa-calculator"></i>
+                    Simulador
+                </button>
+                <button class="tab-btn" onclick="showTab('dashboard')">
+                    <i class="fas fa-chart-bar"></i>
+                    Dashboard
+                </button>
+                <button class="tab-btn" onclick="showTab('tools')">
+                    <i class="fas fa-tools"></i>
+                    Ferramentas
+                </button>
+            </div>
+
             <a href="index.html" class="back-link">
                 <i class="fas fa-arrow-left"></i>
-                Voltar ao Site
+                Voltar
             </a>
         </div>
     </header>
 
     <div class="container">
-        <div class="hero">
-            <h1>Comparador de Renda Fixa</h1>
-            <p class="hero-subtitle">
-                Ferramenta educativa para simular e comparar investimentos
-            </p>
-            <p class="hero-warning">
-                <i class="fas fa-exclamation-triangle"></i> Taxas são exemplos. Sempre consulte as condições atuais do mercado.<br>
-                💡 <strong>Você pode ajustar as taxas na aba "Ferramentas"</strong> para refletir as ofertas que você encontrou.
-            </p>
-        </div>
-
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('simulador')">
-                <i class="fas fa-calculator"></i>
-                Simulador
-            </button>
-            <button class="tab-btn" onclick="showTab('dashboard')">
-                <i class="fas fa-chart-bar"></i>
-                Dashboard
-            </button>
-            <button class="tab-btn" onclick="showTab('tools')">
-                <i class="fas fa-tools"></i>
-                Ferramentas
-            </button>
-        </div>
-
         <!-- Simulador Tab -->
         <div id="tab-simulador" class="tab-content">
             <div class="card">
