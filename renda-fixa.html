@@ -884,7 +884,8 @@
 
         // Update simulation
         function updateSimulation() {
-            state.initialAmount = parseFloat(document.getElementById('initialAmount').value) || 10000;
+            const initialInput = document.getElementById('initialAmount').value;
+            state.initialAmount = initialInput === '' ? 0 : parseFloat(initialInput);
             state.monthlyAmount = parseFloat(document.getElementById('monthlyAmount').value) || 500;
             state.period = parseInt(document.getElementById('period').value) || 12;
             state.showInflation = document.getElementById('showInflation').checked;
