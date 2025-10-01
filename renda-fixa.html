@@ -438,8 +438,12 @@
                             Período: <span id="periodLabel">12</span> meses 
                             (<span id="periodYears">1.0</span> anos)
                         </label>
-                        <input type="range" id="period" min="1" max="120" value="12" 
+                        <input type="range" id="period" min="1" max="360" value="12" 
                                oninput="updatePeriodLabel(); updateSimulation()">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-light); margin-top: 0.3rem;">
+                            <span>1 mês</span>
+                            <span>30 anos</span>
+                        </div>
                     </div>
                 </div>
 
