@@ -24,6 +24,7 @@
             --light-gray: #2a2a2a;
             --white: #ffffff;
             --text-light: #b0b0b0;
+            --poupanca: #ff9800;
         }
 
         body {
@@ -263,6 +264,36 @@
             font-size: 1.1rem;
         }
 
+        .roi-indicator {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--green);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .roi-indicator .break-even {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--green);
+            margin-bottom: 0.5rem;
+        }
+
+        .vs-poupanca {
+            background: rgba(255, 152, 0, 0.15);
+            border: 1px solid var(--poupanca);
+            border-radius: 10px;
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .vs-poupanca .gain {
+            color: var(--green);
+            font-weight: bold;
+        }
+
         .checkbox-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -340,6 +371,38 @@
             border: 1px solid var(--gold);
             border-radius: 10px;
             margin-top: 1rem;
+        }
+
+        .comparison-highlight {
+            background: rgba(255, 152, 0, 0.1);
+            border: 2px solid var(--poupanca);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .comparison-highlight h3 {
+            color: var(--poupanca);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .comparison-item {
+            text-align: center;
+        }
+
+        .comparison-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
         }
 
         .hidden {
@@ -477,7 +540,7 @@
 
                 <!-- Resultado da Meta -->
                 <div id="goalResult" style="display: none; padding: 2rem; background: linear-gradient(135deg, var(--green), var(--gold)); border-radius: 15px; text-align: center; margin-top: 1rem;">
-                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">💰 Aporte Necessário</h3>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Aporte Necessário</h3>
                     <div style="font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem;" id="goalResultAmount">
                         R$ 0,00
                     </div>
@@ -492,6 +555,16 @@
                         <div class="checkbox-grid" id="investmentCheckboxes">
                             <!-- Preenchido via JS -->
                         </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="showPoupanca" checked onchange="updateSimulation()" style="accent-color: var(--poupanca);">
+                            <span>Comparar com Poupança (linha de base)</span>
+                        </label>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin-left: 1.5rem; margin-top: 0.3rem;">
+                            Taxa atual: 6.17% a.a. (ajustada automaticamente pela Selic)
+                        </p>
                     </div>
 
                     <div class="input-group">
@@ -526,8 +599,16 @@
                 </div>
             </div>
 
+            <!-- Comparação com Poupança Destacada -->
+            <div class="comparison-highlight" id="poupancaComparison" style="display: none;">
+                <h3><i class="fas fa-piggy-bank"></i> Comparação com a Poupança</h3>
+                <div class="comparison-grid" id="poupancaComparisonGrid">
+                    <!-- Preenchido via JS -->
+                </div>
+            </div>
+
             <div class="card" id="chartCard">
-                <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">📈 Evolução do Investimento</h3>
+                <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Evolução do Investimento</h3>
                 <div class="chart-container">
                     <canvas id="lineChart"></canvas>
                 </div>
@@ -701,6 +782,8 @@
     </div>
 
     <script>
+        const POUPANCA_RATE = 6.17; // Taxa atual da poupança (70% da Selic quando > 8.5%)
+        
         const defaultRates = {
             'tesouro-selic': 13.75,
             'tesouro-ipca': 10.5,
@@ -781,6 +864,7 @@
             period: 12,
             selectedInvestments: ['tesouro-selic'],
             showInflation: true,
+            showPoupanca: true,
             inflation: 4.5
         };
 
@@ -841,6 +925,8 @@
             };
         }
 
+
+
         function showTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.add('hidden');
@@ -889,6 +975,7 @@
             const simulateOptions = document.getElementById('simulateOptions');
             const chartCard = document.getElementById('chartCard');
             const resultsGrid = document.getElementById('resultsGrid');
+            const poupancaComparison = document.getElementById('poupancaComparison');
             
             if (mode === 'simulate') {
                 simulateMode.style.display = 'grid';
@@ -906,6 +993,7 @@
                 simulateOptions.style.display = 'none';
                 chartCard.style.display = 'none';
                 resultsGrid.style.display = 'none';
+                poupancaComparison.style.display = 'none';
                 modeDescription.textContent = 'Descubra quanto investir por mês para atingir sua meta';
                 calculateGoalAport();
             }
@@ -959,7 +1047,7 @@
                 'R$ ' + monthlyPayment.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             
             if (monthlyPayment <= 0) {
-                document.getElementById('goalResultText').textContent = 'Seu valor inicial já é suficiente! 🎉';
+                document.getElementById('goalResultText').textContent = 'Seu valor inicial já é suficiente!';
             } else {
                 document.getElementById('goalResultText').innerHTML = `
                     por mês durante ${period} meses (${(period/12).toFixed(1)} anos)<br>
@@ -1014,6 +1102,7 @@
             state.monthlyAmount = parseFloat(document.getElementById('monthlyAmount').value) || 500;
             state.period = parseInt(document.getElementById('period').value) || 12;
             state.showInflation = document.getElementById('showInflation').checked;
+            state.showPoupanca = document.getElementById('showPoupanca').checked;
             state.inflation = parseFloat(document.getElementById('inflationRate').value) || 4.5;
             
             if (lineChart) {
@@ -1023,6 +1112,64 @@
             
             createLineChart();
             updateResults();
+            updatePoupancaComparison();
+        }
+
+        function updatePoupancaComparison() {
+            const container = document.getElementById('poupancaComparisonGrid');
+            const section = document.getElementById('poupancaComparison');
+            
+            if (!state.showPoupanca || state.selectedInvestments.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            container.innerHTML = '';
+            
+            let poupancaResult;
+            if (state.mode === 'single') {
+                const final = calculateSingleInvestment(state.initialAmount, POUPANCA_RATE, state.period, false, 0);
+                poupancaResult = {
+                    finalValue: final,
+                    totalInvested: state.initialAmount,
+                    profit: final - state.initialAmount
+                };
+            } else {
+                poupancaResult = calculateRecurring(state.initialAmount, state.monthlyAmount, POUPANCA_RATE, state.period, false, 0);
+            }
+            
+            state.selectedInvestments.forEach(key => {
+                const inv = investments[key];
+                let invResult;
+                
+                if (state.mode === 'single') {
+                    const final = calculateSingleInvestment(state.initialAmount, inv.rate, state.period, inv.hasIR, inv.custody);
+                    invResult = {
+                        finalValue: final,
+                        totalInvested: state.initialAmount,
+                        profit: final - state.initialAmount
+                    };
+                } else {
+                    invResult = calculateRecurring(state.initialAmount, state.monthlyAmount, inv.rate, state.period, inv.hasIR, inv.custody);
+                }
+                
+                const difference = invResult.finalValue - poupancaResult.finalValue;
+                const percentDiff = ((difference / poupancaResult.finalValue) * 100).toFixed(2);
+                
+                const item = document.createElement('div');
+                item.className = 'comparison-item';
+                item.innerHTML = `
+                    <div style="font-weight: 600; color: ${inv.color}; margin-bottom: 0.5rem;">${inv.name}</div>
+                    <div class="comparison-value" style="color: ${difference > 0 ? 'var(--green)' : 'var(--secondary)'};">
+                        ${difference > 0 ? '+' : ''}R$ ${difference.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                    </div>
+                    <div style="color: var(--text-light); font-size: 0.9rem;">
+                        ${difference > 0 ? '+' : ''}${percentDiff}% vs Poupança
+                    </div>
+                `;
+                container.appendChild(item);
+            });
         }
 
         function createLineChart() {
@@ -1086,6 +1233,33 @@
                 labels.push(i);
             }
             
+            // Poupança
+            if (state.showPoupanca) {
+                const poupancaData = [];
+                for (let month = 0; month <= state.period; month++) {
+                    let value;
+                    if (state.mode === 'single') {
+                        value = calculateSingleInvestment(state.initialAmount, POUPANCA_RATE, month, false, 0);
+                    } else {
+                        const result = calculateRecurring(state.initialAmount, state.monthlyAmount, POUPANCA_RATE, month, false, 0);
+                        value = result.finalValue;
+                    }
+                    poupancaData.push(value);
+                }
+                
+                datasets.push({
+                    label: 'Poupança (Referência)',
+                    data: poupancaData,
+                    borderColor: '#ff9800',
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    borderDash: [10, 5],
+                    tension: 0.1,
+                    pointRadius: 0
+                });
+            }
+            
+            // Investimentos selecionados
             state.selectedInvestments.forEach(key => {
                 const inv = investments[key];
                 const data = [];
@@ -1094,22 +1268,9 @@
                 for (let month = 0; month <= state.period; month++) {
                     let value;
                     if (state.mode === 'single') {
-                        value = calculateSingleInvestment(
-                            state.initialAmount, 
-                            inv.rate, 
-                            month, 
-                            inv.hasIR,
-                            inv.custody
-                        );
+                        value = calculateSingleInvestment(state.initialAmount, inv.rate, month, inv.hasIR, inv.custody);
                     } else {
-                        const result = calculateRecurring(
-                            state.initialAmount,
-                            state.monthlyAmount,
-                            inv.rate,
-                            month,
-                            inv.hasIR,
-                            inv.custody
-                        );
+                        const result = calculateRecurring(state.initialAmount, state.monthlyAmount, inv.rate, month, inv.hasIR, inv.custody);
                         value = result.finalValue;
                     }
                     
@@ -1158,30 +1319,31 @@
                 let result;
                 
                 if (state.mode === 'single') {
-                    const final = calculateSingleInvestment(
-                        state.initialAmount, 
-                        inv.rate, 
-                        state.period, 
-                        inv.hasIR,
-                        inv.custody
-                    );
+                    const final = calculateSingleInvestment(state.initialAmount, inv.rate, state.period, inv.hasIR, inv.custody);
                     result = {
                         finalValue: final,
                         totalInvested: state.initialAmount,
                         profit: final - state.initialAmount
                     };
                 } else {
-                    result = calculateRecurring(
-                        state.initialAmount,
-                        state.monthlyAmount,
-                        inv.rate,
-                        state.period,
-                        inv.hasIR,
-                        inv.custody
-                    );
+                    result = calculateRecurring(state.initialAmount, state.monthlyAmount, inv.rate, state.period, inv.hasIR, inv.custody);
                 }
 
                 const returnPercent = (result.profit / result.totalInvested * 100).toFixed(2);
+                
+                // Comparação com poupança
+                let poupancaResult;
+                if (state.mode === 'single') {
+                    const final = calculateSingleInvestment(state.initialAmount, POUPANCA_RATE, state.period, false, 0);
+                    poupancaResult = {
+                        finalValue: final,
+                        profit: final - state.initialAmount
+                    };
+                } else {
+                    poupancaResult = calculateRecurring(state.initialAmount, state.monthlyAmount, POUPANCA_RATE, state.period, false, 0);
+                }
+                
+                const vsPoupanca = result.profit - poupancaResult.profit;
                 
                 const card = document.createElement('div');
                 card.className = 'result-card';
@@ -1206,6 +1368,17 @@
                             <span style="font-size: 0.9rem; margin-left: 0.5rem;">(${returnPercent}%)</span>
                         </div>
                     </div>
+                    
+                    ${state.showPoupanca ? `
+                    <div class="vs-poupanca">
+                        <strong>vs Poupança:</strong> 
+                        <span class="gain">${vsPoupanca > 0 ? '+' : ''}R$ ${vsPoupanca.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                        <div style="font-size: 0.8rem; margin-top: 0.3rem; color: var(--text-light);">
+                            ${vsPoupanca > 0 ? 'Você ganha ' : 'Você perde '}R$ ${Math.abs(vsPoupanca).toLocaleString('pt-BR', {minimumFractionDigits: 2})} a mais que na poupança
+                        </div>
+                    </div>
+                    ` : ''}
+                    
                     <div style="font-size: 0.85rem; color: var(--text-light); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.8rem; margin-top: 0.8rem;">
                         <div>Taxa: ${inv.rate}% a.a.</div>
                         <div>IR: ${inv.hasIR ? getTaxRate(state.period) + '%' : 'Isento'}</div>
@@ -1232,6 +1405,14 @@
                     value: ((result.finalValue - 10000) / 10000 * 100).toFixed(2),
                     color: inv.color
                 };
+            });
+            
+            // Adicionar poupança
+            const poupancaResult = calculateRecurring(10000, 0, POUPANCA_RATE, 12, false, 0);
+            data.push({
+                name: 'Poupança',
+                value: ((poupancaResult.finalValue - 10000) / 10000 * 100).toFixed(2),
+                color: '#ff9800'
             });
             
             barChart = new Chart(ctx, {
@@ -1267,6 +1448,18 @@
 
             const tbody = document.getElementById('comparisonTable');
             tbody.innerHTML = '';
+            
+            // Adicionar poupança na tabela
+            const poupancaRow = tbody.insertRow();
+            poupancaRow.innerHTML = `
+                <td style="font-weight: 600; color: #ff9800;">Poupança</td>
+                <td>${POUPANCA_RATE}%</td>
+                <td>Isento</td>
+                <td>Imediata</td>
+                <td>Muito Baixo</td>
+                <td>R$ 0</td>
+            `;
+            
             Object.entries(investments).forEach(([key, inv]) => {
                 const row = tbody.insertRow();
                 row.innerHTML = `
