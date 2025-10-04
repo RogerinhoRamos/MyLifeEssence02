@@ -231,16 +231,6 @@
             font-size: 1rem;
         }
 
-        .input-group select {
-            cursor: pointer;
-        }
-
-        .input-group select option {
-            background: var(--gray);
-            color: var(--white);
-            padding: 0.5rem;
-        }
-
         .stat-card {
             border-radius: 15px;
             padding: 2rem;
@@ -426,27 +416,13 @@
 
                 <div class="grid grid-2">
                     <div class="input-group">
-                        <label>O que você quer fazer?</label>
-                        <div class="mode-toggle">
-                            <button class="active" onclick="setCalculationMode('simulate')">Simular Retorno</button>
-                            <button onclick="setCalculationMode('goal')">Calcular Aporte</button>
-                        </div>
-                        <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;" id="modeDescription">
-                            Veja quanto seu dinheiro vai render
-                        </p>
-                    </div>
-
-                    <div class="input-group">
                         <label>Tipo de Investimento</label>
                         <div class="mode-toggle">
                             <button class="active" onclick="setMode('single')">Único</button>
                             <button onclick="setMode('recurring')">Recorrente</button>
                         </div>
                     </div>
-                </div>
 
-                <!-- Modo Simulação -->
-                <div id="simulateMode" class="grid grid-2">
                     <div class="input-group">
                         <label>Valor Inicial (R$)</label>
                         <input type="number" id="initialAmount" value="10000" oninput="updateSimulation()">
@@ -471,60 +447,7 @@
                     </div>
                 </div>
 
-                <!-- Modo Meta -->
-                <div id="goalMode" class="grid grid-2" style="display: none;">
-                    <div class="input-group">
-                        <label>Quanto você quer ter? (R$)</label>
-                        <input type="number" id="goalAmount" value="100000" oninput="calculateGoalAport()">
-                    </div>
-
-                    <div class="input-group">
-                        <label>Valor Inicial (R$)</label>
-                        <input type="number" id="goalInitialAmount" value="0" oninput="calculateGoalAport()">
-                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.3rem;">
-                            Quanto você já tem para começar
-                        </p>
-                    </div>
-
-                    <div class="input-group">
-                        <label>
-                            Em quanto tempo? <span id="goalPeriodLabel">120</span> meses 
-                            (<span id="goalPeriodYears">10.0</span> anos)
-                        </label>
-                        <input type="range" id="goalPeriod" min="1" max="360" value="120" 
-                               oninput="updateGoalPeriodLabel(); calculateGoalAport()">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-light); margin-top: 0.3rem;">
-                            <span>1 mês</span>
-                            <span>30 anos</span>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Qual investimento?</label>
-                        <select id="goalInvestment" onchange="calculateGoalAport()" style="
-                            width: 100%;
-                            padding: 0.8rem;
-                            background: rgba(255, 255, 255, 0.1);
-                            border: 1px solid rgba(255, 255, 255, 0.2);
-                            border-radius: 10px;
-                            color: var(--white);
-                            font-size: 1rem;
-                        ">
-                            <!-- Preenchido via JS -->
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Resultado da Meta -->
-                <div id="goalResult" style="display: none; padding: 2rem; background: linear-gradient(135deg, var(--green), var(--gold)); border-radius: 15px; text-align: center; margin-top: 1rem;">
-                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Aporte Necessário</h3>
-                    <div style="font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem;" id="goalResultAmount">
-                        R$ 0,00
-                    </div>
-                    <p style="font-size: 1rem; opacity: 0.9;" id="goalResultText">por mês</p>
-                </div>
-
-                <div class="grid grid-2" style="margin-top: 1rem;">
+                <div class="input-group">
                     <label style="font-size: 1.1rem; margin-bottom: 1rem;">
                         Selecione os investimentos para comparar (até 4):
                     </label>
@@ -815,7 +738,6 @@
         // Estado da aplicação
         let state = {
             mode: 'single',
-            calculationMode: 'simulate', // 'simulate' ou 'goal'
             initialAmount: 10000,
             monthlyAmount: 500,
             period: 12,
@@ -917,101 +839,11 @@
             updateSimulation();
         }
 
-        // Calculation mode toggle
-        function setCalculationMode(mode) {
-            state.calculationMode = mode;
-            const buttons = event.target.parentElement.querySelectorAll('button');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            const simulateMode = document.getElementById('simulateMode');
-            const goalMode = document.getElementById('goalMode');
-            const goalResult = document.getElementById('goalResult');
-            const modeDescription = document.getElementById('modeDescription');
-            
-            if (mode === 'simulate') {
-                simulateMode.style.display = 'grid';
-                goalMode.style.display = 'none';
-                goalResult.style.display = 'none';
-                modeDescription.textContent = 'Veja quanto seu dinheiro vai render';
-                updateSimulation();
-            } else {
-                simulateMode.style.display = 'none';
-                goalMode.style.display = 'grid';
-                goalResult.style.display = 'block';
-                modeDescription.textContent = 'Descubra quanto investir por mês para atingir sua meta';
-                calculateGoalAport();
-            }
-        }
-
         // Period label
         function updatePeriodLabel() {
             const period = document.getElementById('period').value;
             document.getElementById('periodLabel').textContent = period;
             document.getElementById('periodYears').textContent = (period / 12).toFixed(1);
-        }
-
-        function updateGoalPeriodLabel() {
-            const period = document.getElementById('goalPeriod').value;
-            document.getElementById('goalPeriodLabel').textContent = period;
-            document.getElementById('goalPeriodYears').textContent = (period / 12).toFixed(1);
-        }
-
-        // Calculate monthly payment needed to reach goal
-        function calculateGoalAport() {
-            const goalAmount = parseFloat(document.getElementById('goalAmount').value) || 100000;
-            const initialAmount = parseFloat(document.getElementById('goalInitialAmount').value) || 0;
-            const period = parseInt(document.getElementById('goalPeriod').value) || 120;
-            const invKey = document.getElementById('goalInvestment').value || 'tesouro-selic';
-            
-            const inv = investments[invKey];
-            const monthlyRate = inv.rate / 100 / 12;
-            const taxRate = getTaxRate(period);
-            
-            // Ajustar meta para considerar IR
-            const adjustedGoal = inv.hasIR ? goalAmount / (1 - taxRate / 100) : goalAmount;
-            
-            // Calcular valor futuro do investimento inicial
-            let futureInitial = initialAmount;
-            for (let i = 0; i < period; i++) {
-                futureInitial = futureInitial * (1 + monthlyRate);
-                if (inv.custody > 0) {
-                    futureInitial = futureInitial * (1 - inv.custody / 100 / 12);
-                }
-            }
-            
-            // Valor que falta atingir com aportes mensais
-            const remaining = adjustedGoal - futureInitial;
-            
-            // Calcular PMT necessário
-            // FV = PMT * [((1 + r)^n - 1) / r]
-            // PMT = FV * r / ((1 + r)^n - 1)
-            
-            let monthlyPayment = 0;
-            if (remaining > 0) {
-                const factor = Math.pow(1 + monthlyRate, period) - 1;
-                monthlyPayment = (remaining * monthlyRate) / factor;
-                
-                // Ajustar para custódia se houver
-                if (inv.custody > 0) {
-                    monthlyPayment = monthlyPayment * (1 + inv.custody / 100 / 12);
-                }
-            }
-            
-            // Mostrar resultado
-            document.getElementById('goalResultAmount').textContent = 
-                'R$ ' + monthlyPayment.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            
-            if (monthlyPayment <= 0) {
-                document.getElementById('goalResultText').textContent = 'Seu valor inicial já é suficiente!';
-            } else {
-                document.getElementById('goalResultText').innerHTML = `
-                    por mês durante ${period} meses<br>
-                    <span style="font-size: 0.9rem; opacity: 0.8;">
-                        Investimento: ${inv.name} (${inv.rate}% a.a.)
-                    </span>
-                `;
-            }
         }
 
         // Initialize checkboxes
@@ -1429,23 +1261,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeCheckboxes();
             initializeRatesEditor();
-            initializeGoalSelect();
             updateSimulation();
             calculateFGC();
         });
-
-        // Initialize goal investment select
-        function initializeGoalSelect() {
-            const select = document.getElementById('goalInvestment');
-            select.innerHTML = '';
-            
-            Object.entries(investments).forEach(([key, inv]) => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = `${inv.name} (${inv.rate}% a.a.)`;
-                select.appendChild(option);
-            });
-        }
     </script>
 </body>
 </html>
