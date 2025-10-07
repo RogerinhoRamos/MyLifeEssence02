@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador CNC | RR Rogerinho Ramos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --secondary: #ff6b35;
+            --purple: #8b5cf6;
+            --green: #10b981;
+            --gold: #fbbf24;
+            --dark: #0a0a0a;
+            --gray: #1a1a1a;
+            --light-gray: #2a2a2a;
+            --white: #ffffff;
+            --text-light: #b0b0b0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--gray) 100%);
+            color: var(--white);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-rr {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-nome {
+            font-size: 1.6rem;
+            font-weight: 500;
+            font-family: 'Brush Script MT', cursive;
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        .simulator-container {
+            display: flex;
+            height: calc(100vh - 100px);
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .editor-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--dark);
+        }
+
+        .editor-header {
+            background: rgba(10, 10, 10, 0.95);
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .editor-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .editor-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .editor-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .line-numbers {
+            background: var(--gray);
+            padding: 1rem 0.5rem;
+            text-align: right;
+            color: var(--text-light);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-y: auto;
+            min-width: 50px;
+        }
+
+        .code-editor {
+            flex: 1;
+            background: var(--dark);
+            color: var(--white);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            padding: 1rem;
+            border: none;
+            outline: none;
+            resize: none;
+            overflow-y: auto;
+        }
+
+        .editor-footer {
+            background: rgba(10, 10, 10, 0.95);
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .viewer-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            background: var(--gray);
+        }
+
+        .viewer-header {
+            background: rgba(10, 10, 10, 0.95);
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .viewer-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .legend {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .legend-line {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            background: #1a1a2e;
+        }
+
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls-overlay {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            width: 45px;
+            height: 45px;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: var(--primary);
+        }
+
+        .info-panel {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            background: rgba(10, 10, 10, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 200px;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 0.3rem;
+        }
+
+        .stats-grid {
+            background: rgba(10, 10, 10, 0.95);
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1024px) {
+            .simulator-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .editor-panel,
+            .viewer-panel {
+                width: 100%;
+                min-height: 50vh;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <span class="logo-rr">RR</span>
+                <span class="logo-nome">Rogerinho Ramos</span>
+            </a>
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Voltar
+            </a>
+        </div>
+    </header>
+
+    <div class="simulator-container">
+        <!-- Editor Panel -->
+        <div class="editor-panel">
+            <div class="editor-header">
+                <div class="editor-title">
+                    <i class="fas fa-code"></i> Editor G-Code
+                </div>
+                <div class="editor-buttons">
+                    <button class="btn btn-secondary" onclick="loadExample()">
+                        <i class="fas fa-folder-open"></i> Exemplos
+                    </button>
+                    <button class="btn btn-secondary" onclick="saveProgram()">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                    <label class="btn btn-secondary" style="cursor: pointer;">
+                        <i class="fas fa-upload"></i> Abrir
+                        <input type="file" accept=".nc,.txt,.gcode" onchange="uploadFile(event)" style="display: none;">
+                    </label>
+                </div>
+            </div>
+            
+            <div class="editor-content">
+                <div class="line-numbers" id="lineNumbers"></div>
+                <textarea 
+                    class="code-editor" 
+                    id="codeEditor" 
+                    placeholder="Cole seu código G aqui ou carregue um exemplo..."
+                    oninput="updateLineNumbers()"
+                ></textarea>
+            </div>
+
+            <div class="editor-footer">
+                <button class="btn btn-primary" onclick="runSimulation()">
+                    <i class="fas fa-play"></i> Executar
+                </button>
+                <button class="btn btn-secondary" onclick="pauseSimulation()">
+                    <i class="fas fa-pause"></i> Pausar
+                </button>
+                <button class="btn btn-secondary" onclick="resetSimulation()">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Viewer Panel -->
+        <div class="viewer-panel">
+            <div class="viewer-header">
+                <div class="viewer-title">
+                    <i class="fas fa-cube"></i> Visualização 3D
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-line" style="background: #ff0000;"></div>
+                        <span>G00 Rápido</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line" style="background: #00ff00;"></div>
+                        <span>G01 Usinagem</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line" style="background: #00bfff;"></div>
+                        <span>G02/G03 Arco</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="canvas3d"></canvas>
+                
+                <div class="controls-overlay">
+                    <button class="control-btn" onclick="zoomIn()" title="Zoom In">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="control-btn" onclick="zoomOut()" title="Zoom Out">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button class="control-btn" onclick="resetCamera()" title="Reset">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="control-btn" onclick="toggleFullscreen()" title="Tela Cheia">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+
+                <div class="info-panel">
+                    <div class="info-label">Controles:</div>
+                    <div style="font-size: 0.8rem; line-height: 1.6;">
+                        🖱️ Arrastar: Rotacionar<br>
+                        🖱️ Scroll: Zoom<br>
+                        📏 Distância: <span id="cameraDistance">120</span>mm
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">X</div>
+                    <div class="stat-value" style="color: var(--primary);" id="posX">0.00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Y</div>
+                    <div class="stat-value" style="color: var(--green);" id="posY">0.00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Z</div>
+                    <div class="stat-value" style="color: var(--purple);" id="posZ">0.00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Spindle</div>
+                    <div class="stat-value" style="color: var(--gold);" id="spindle">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Exemplo de código G
+        const exampleCode = `; FANUC - Círculo Simples
+G54 G90 G21 G17
+M03 S1500
+
+G00 X30 Y0 Z5
+G01 Z-2 F100
+G02 X30 Y0 I-30 J0 F150
+G00 Z5
+
+M05
+M30`;
+
+        // Three.js Setup
+        let scene, camera, renderer;
+        let cameraDistance = 120;
+        let cameraAngle = { theta: 45, phi: 45 };
+        let isDragging = false;
+        let lastMousePos = { x: 0, y: 0 };
+
+        function init3D() {
+            const canvas = document.getElementById('canvas3d');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+
+            camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            camera.position.set(100, 100, 100);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+
+            // Luzes
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(50, 50, 50);
+            scene.add(directionalLight);
+
+            // Grade
+            const gridHelper = new THREE.GridHelper(200, 20, 0x4a5568, 0x2a2a3e);
+            scene.add(gridHelper);
+
+            // Eixos
+            const axesHelper = new THREE.AxesHelper(50);
+            scene.add(axesHelper);
+
+            // Mesa
+            const tableGeometry = new THREE.BoxGeometry(100, 2, 100);
+            const tableMaterial = new THREE.MeshPhongMaterial({ color: 0x4a5568 });
+            const table = new THREE.Mesh(tableGeometry, tableMaterial);
+            table.position.y = -1;
+            scene.add(table);
+
+            // Peça
+            const workpieceGeometry = new THREE.BoxGeometry(80, 20, 80);
+            const workpieceMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x94a3b8,
+                transparent: true,
+                opacity: 0.7
+            });
+            const workpiece = new THREE.Mesh(workpieceGeometry, workpieceMaterial);
+            workpiece.position.y = 10;
+            scene.add(workpiece);
+
+            // Ferramenta
+            const toolGeometry = new THREE.ConeGeometry(2, 15, 8);
+            const toolMaterial = new THREE.MeshPhongMaterial({ color: 0xfbbf24 });
+            const tool = new THREE.Mesh(toolGeometry, toolMaterial);
+            tool.position.set(0, 30, 0);
+            tool.rotation.x = Math.PI;
+            scene.add(tool);
+
+            // Mouse events
+            canvas.addEventListener('mousedown', onMouseDown);
+            canvas.addEventListener('mousemove', onMouseMove);
+            canvas.addEventListener('mouseup', onMouseUp);
+            canvas.addEventListener('wheel', onWheel);
+
+            // Resize
+            window.addEventListener('resize', onResize);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const theta = cameraAngle.theta * Math.PI / 180;
+            const phi = cameraAngle.phi * Math.PI / 180;
+            
+            camera.position.x = cameraDistance * Math.sin(phi) * Math.cos(theta);
+            camera.position.y = cameraDistance * Math.cos(phi);
+            camera.position.z = cameraDistance * Math.sin(phi) * Math.sin(theta);
+            camera.lookAt(0, 0, 0);
+            
+            renderer.render(scene, camera);
+        }
+
+        function onMouseDown(e) {
+            isDragging = true;
+            lastMousePos = { x: e.clientX, y: e.clientY };
+        }
+
+        function onMouseMove(e) {
+            if (!isDragging) return;
+            
+            const deltaX = e.clientX - lastMousePos.x;
+            const deltaY = e.clientY - lastMousePos.y;
+            
+            cameraAngle.theta += deltaX * 0.5;
+            cameraAngle.phi = Math.max(5, Math.min(175, cameraAngle.phi + deltaY * 0.5));
+            
+            lastMousePos = { x: e.clientX, y: e.clientY };
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+        }
+
+        function onWheel(e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 10 : -10;
+            cameraDistance = Math.max(30, Math.min(300, cameraDistance + delta));
+            document.getElementById('cameraDistance').textContent = cameraDistance.toFixed(0);
+        }
+
+        function onResize() {
+            const canvas = document.getElementById('canvas3d');
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        }
+
+        function zoomIn() {
+            cameraDistance = Math.max(30, cameraDistance - 20);
+            document.getElementById('cameraDistance').textContent = cameraDistance.toFixed(0);
+        }
+
+        function zoomOut() {
+            cameraDistance = Math.min(300, cameraDistance + 20);
+            document.getElementById('cameraDistance').textContent = cameraDistance.toFixed(0);
+        }
+
+        function resetCamera() {
+            cameraDistance = 120;
+            cameraAngle = { theta: 45, phi: 45 };
+            document.getElementById('cameraDistance').textContent = '120';
+        }
+
+        function toggleFullscreen() {
+            const viewer = document.querySelector('.viewer-panel');
+            if (!document.fullscreenElement) {
+                viewer.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function updateLineNumbers() {
+            const editor = document.getElementById('codeEditor');
+            const lineNumbers = document.getElementById('lineNumbers');
+            const lines = editor.value.split('\n').length;
+            lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+        }
+
+        function loadExample() {
+            document.getElementById('codeEditor').value = exampleCode;
+            updateLineNumbers();
+        }
+
+        function saveProgram() {
+            const code = document.getElementById('codeEditor').value;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'programa.nc';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function uploadFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('codeEditor').value = e.target.result;
+                    updateLineNumbers();
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function runSimulation() {
+            alert('Simulação iniciada! (Implementação completa em desenvolvimento)');
+        }
+
+        function pauseSimulation() {
+            alert('Simulação pausada!');
+        }
+
+        function resetSimulation() {
+            document.getElementById('posX').textContent = '0.00';
+            document.getElementById('posY').textContent = '0.00';
+            document.getElementById('posZ').textContent = '0.00';
+            document.getElementById('spindle').textContent = '0';
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            init3D();
+            loadExample();
+        });
+    </script>
+</body>
+</html>
