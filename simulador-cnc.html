@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador CNC | RR Rogerinho Ramos</title>
+    <title>Simulador CNC Profissional | RR Rogerinho Ramos</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
@@ -19,6 +19,7 @@
             --purple: #8b5cf6;
             --green: #10b981;
             --gold: #fbbf24;
+            --accent: #4ecdc4;
             --dark: #0a0a0a;
             --gray: #1a1a1a;
             --light-gray: #2a2a2a;
@@ -30,38 +31,51 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, var(--dark) 0%, var(--gray) 100%);
             color: var(--white);
-            min-height: 100vh;
             margin: 0;
-            overflow-x: hidden;
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 4px;
         }
 
         .header {
             background: rgba(10, 10, 10, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.5rem 5%;
+            padding: 1rem 2%;
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
         .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
+            max-width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             text-decoration: none;
         }
 
         .logo-rr {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 800;
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
@@ -69,12 +83,20 @@
         }
 
         .logo-nome {
-            font-size: 1.6rem;
+            font-size: 1.3rem;
             font-weight: 500;
             font-family: 'Brush Script MT', cursive;
             background: linear-gradient(45deg, var(--primary), var(--secondary), var(--gold));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
         }
 
         .back-link {
@@ -84,58 +106,79 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 50px;
             transition: all 0.3s ease;
         }
 
         .back-link:hover {
-            transform: translateX(-5px);
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateX(-3px);
         }
 
-        .simulator-container {
+        .main-container {
             display: flex;
-            height: calc(100vh - 100px);
-            max-width: 100%;
-            margin: 0;
+            height: calc(100vh - 80px);
         }
 
-        .editor-panel {
+        .editor-section {
             width: 50%;
             display: flex;
             flex-direction: column;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
-            background: var(--dark);
         }
 
-        .editor-header {
+        .editor-toolbar {
             background: rgba(10, 10, 10, 0.95);
             padding: 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .editor-title {
-            font-size: 1.2rem;
+        .program-name-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 0.6rem;
+            color: var(--white);
+            font-size: 1rem;
             font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
+            width: 100%;
         }
 
-        .editor-buttons {
+        .program-name-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .toolbar-buttons {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
         }
 
+        .dialect-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
         .btn {
-            padding: 0.6rem 1.2rem;
+            padding: 0.6rem 1rem;
             border: none;
             border-radius: 50px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.9rem;
-            display: flex;
+            font-size: 0.85rem;
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            white-space: nowrap;
         }
 
         .btn-primary {
@@ -149,11 +192,25 @@
             border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
+        .btn-dialect {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--white);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.8rem;
         }
 
-        .editor-content {
+        .btn-dialect.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+        }
+
+        .editor-area {
             flex: 1;
             display: flex;
             overflow: hidden;
@@ -161,13 +218,24 @@
 
         .line-numbers {
             background: var(--gray);
-            padding: 1rem 0.5rem;
+            padding: 1rem 0.8rem;
             text-align: right;
             color: var(--text-light);
             font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
             overflow-y: auto;
-            min-width: 50px;
+            user-select: none;
+        }
+
+        .line-number {
+            padding: 0 0.5rem;
+        }
+
+        .line-number.active {
+            background: rgba(0, 212, 255, 0.3);
+            color: var(--white);
+            font-weight: bold;
         }
 
         .code-editor {
@@ -175,54 +243,58 @@
             background: var(--dark);
             color: var(--white);
             font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
             padding: 1rem;
             border: none;
             outline: none;
             resize: none;
             overflow-y: auto;
+            tab-size: 4;
         }
 
-        .editor-footer {
+        .code-editor::placeholder {
+            color: var(--text-light);
+        }
+
+        .editor-controls {
             background: rgba(10, 10, 10, 0.95);
             padding: 1rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
-            gap: 1rem;
+            gap: 0.8rem;
         }
 
-        .viewer-panel {
+        .viewer-section {
             width: 50%;
             display: flex;
             flex-direction: column;
-            background: var(--gray);
         }
 
         .viewer-header {
             background: rgba(10, 10, 10, 0.95);
             padding: 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .viewer-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: var(--primary);
+            margin-bottom: 0.8rem;
         }
 
         .legend {
             display: flex;
-            gap: 1rem;
-            font-size: 0.85rem;
+            gap: 1.5rem;
+            font-size: 0.8rem;
+            flex-wrap: wrap;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.4rem;
         }
 
         .legend-line {
@@ -231,7 +303,7 @@
             border-radius: 2px;
         }
 
-        .canvas-container {
+        .canvas-wrapper {
             flex: 1;
             position: relative;
             background: #1a1a2e;
@@ -241,9 +313,10 @@
             width: 100%;
             height: 100%;
             display: block;
+            cursor: move;
         }
 
-        .controls-overlay {
+        .camera-controls {
             position: absolute;
             top: 1rem;
             right: 1rem;
@@ -253,9 +326,9 @@
         }
 
         .control-btn {
-            width: 45px;
-            height: 45px;
-            background: rgba(10, 10, 10, 0.8);
+            width: 42px;
+            height: 42px;
+            background: rgba(10, 10, 10, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             color: var(--white);
@@ -264,15 +337,16 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .control-btn:hover {
             background: rgba(0, 212, 255, 0.3);
             border-color: var(--primary);
+            transform: scale(1.1);
         }
 
-        .info-panel {
+        .info-overlay {
             position: absolute;
             bottom: 1rem;
             left: 1rem;
@@ -280,25 +354,25 @@
             padding: 1rem;
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            min-width: 200px;
+            font-size: 0.8rem;
         }
 
-        .info-label {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            margin-bottom: 0.3rem;
+        .info-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
         }
 
-        .stats-grid {
+        .stats-bar {
             background: rgba(10, 10, 10, 0.95);
             padding: 1rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 1rem;
         }
 
-        .stat-item {
+        .stat-box {
             text-align: center;
         }
 
@@ -313,31 +387,204 @@
             font-weight: bold;
         }
 
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--secondary);
+            transform: rotate(90deg);
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .example-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .example-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .example-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--white);
+        }
+
+        .example-category {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: var(--purple);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .example-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.4;
+        }
+
+        .code-reference {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .code-ref-title {
+            color: var(--purple);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-ref-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .g65-mapping {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .mapping-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.8rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mapping-letter {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .mapping-var {
+            font-size: 1rem;
+            color: var(--purple);
+            font-family: 'Courier New', monospace;
+        }
+
         @media (max-width: 1024px) {
-            .simulator-container {
+            .main-container {
                 flex-direction: column;
                 height: auto;
             }
             
-            .editor-panel,
-            .viewer-panel {
+            .editor-section,
+            .viewer-section {
                 width: 100%;
                 min-height: 50vh;
             }
 
-            .stats-grid {
+            .stats-bar {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header-title {
+                order: 3;
+                width: 100%;
+                text-align: left;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .toolbar-buttons,
+            .dialect-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Header -->
     <header class="header">
         <div class="header-content">
             <a href="index.html" class="logo">
                 <span class="logo-rr">RR</span>
                 <span class="logo-nome">Rogerinho Ramos</span>
             </a>
+            <div class="header-title">
+                <i class="fas fa-microchip"></i> Simulador CNC Profissional
+            </div>
             <a href="index.html" class="back-link">
                 <i class="fas fa-arrow-left"></i>
                 Voltar
@@ -345,42 +592,61 @@
         </div>
     </header>
 
-    <div class="simulator-container">
-        <!-- Editor Panel -->
-        <div class="editor-panel">
-            <div class="editor-header">
-                <div class="editor-title">
-                    <i class="fas fa-code"></i> Editor G-Code
-                </div>
-                <div class="editor-buttons">
-                    <button class="btn btn-secondary" onclick="loadExample()">
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Editor Section -->
+        <div class="editor-section">
+            <div class="editor-toolbar">
+                <input 
+                    type="text" 
+                    id="programName" 
+                    class="program-name-input" 
+                    value="Novo Programa" 
+                    placeholder="Nome do programa"
+                >
+                
+                <div class="toolbar-buttons">
+                    <button class="btn btn-secondary" onclick="openExamples()">
                         <i class="fas fa-folder-open"></i> Exemplos
                     </button>
-                    <button class="btn btn-secondary" onclick="saveProgram()">
+                    <button class="btn btn-secondary" onclick="openCodeRef()">
+                        <i class="fas fa-book"></i> Códigos G/M
+                    </button>
+                    <button class="btn btn-secondary" onclick="openVariables()">
+                        <i class="fas fa-hashtag"></i> Variáveis
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadProgram()">
                         <i class="fas fa-save"></i> Salvar
                     </button>
-                    <label class="btn btn-secondary" style="cursor: pointer;">
+                    <label class="btn btn-secondary" style="cursor: pointer; margin: 0;">
                         <i class="fas fa-upload"></i> Abrir
                         <input type="file" accept=".nc,.txt,.gcode" onchange="uploadFile(event)" style="display: none;">
                     </label>
                 </div>
+
+                <div class="dialect-buttons">
+                    <button class="btn-dialect active" onclick="setDialect('FANUC')" data-dialect="FANUC">FANUC</button>
+                    <button class="btn-dialect" onclick="setDialect('SIEMENS')" data-dialect="SIEMENS">Siemens</button>
+                    <button class="btn-dialect" onclick="setDialect('HEIDENHAIN')" data-dialect="HEIDENHAIN">Heidenhain</button>
+                    <button class="btn-dialect" onclick="setDialect('ISO')" data-dialect="ISO">ISO</button>
+                </div>
             </div>
-            
-            <div class="editor-content">
+
+            <div class="editor-area">
                 <div class="line-numbers" id="lineNumbers"></div>
                 <textarea 
                     class="code-editor" 
-                    id="codeEditor" 
+                    id="codeEditor"
                     placeholder="Cole seu código G aqui ou carregue um exemplo..."
-                    oninput="updateLineNumbers()"
+                    spellcheck="false"
                 ></textarea>
             </div>
 
-            <div class="editor-footer">
-                <button class="btn btn-primary" onclick="runSimulation()">
+            <div class="editor-controls">
+                <button class="btn btn-primary" onclick="runSimulation()" id="runBtn">
                     <i class="fas fa-play"></i> Executar
                 </button>
-                <button class="btn btn-secondary" onclick="pauseSimulation()">
+                <button class="btn btn-secondary" onclick="pauseSimulation()" id="pauseBtn" style="display: none;">
                     <i class="fas fa-pause"></i> Pausar
                 </button>
                 <button class="btn btn-secondary" onclick="resetSimulation()">
@@ -389,11 +655,11 @@
             </div>
         </div>
 
-        <!-- Viewer Panel -->
-        <div class="viewer-panel">
+        <!-- Viewer Section -->
+        <div class="viewer-section">
             <div class="viewer-header">
                 <div class="viewer-title">
-                    <i class="fas fa-cube"></i> Visualização 3D
+                    <i class="fas fa-cube"></i> Visualização 3D <span id="dialectDisplay">FANUC</span>
                 </div>
                 <div class="legend">
                     <div class="legend-item">
@@ -411,17 +677,17 @@
                 </div>
             </div>
 
-            <div class="canvas-container">
+            <div class="canvas-wrapper">
                 <canvas id="canvas3d"></canvas>
                 
-                <div class="controls-overlay">
+                <div class="camera-controls">
                     <button class="control-btn" onclick="zoomIn()" title="Zoom In">
                         <i class="fas fa-plus"></i>
                     </button>
                     <button class="control-btn" onclick="zoomOut()" title="Zoom Out">
                         <i class="fas fa-minus"></i>
                     </button>
-                    <button class="control-btn" onclick="resetCamera()" title="Reset">
+                    <button class="control-btn" onclick="resetCamera()" title="Reset Câmera">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                     <button class="control-btn" onclick="toggleFullscreen()" title="Tela Cheia">
@@ -429,42 +695,132 @@
                     </button>
                 </div>
 
-                <div class="info-panel">
-                    <div class="info-label">Controles:</div>
-                    <div style="font-size: 0.8rem; line-height: 1.6;">
+                <div class="info-overlay">
+                    <div class="info-title">Controles 3D:</div>
+                    <div style="line-height: 1.8;">
                         🖱️ Arrastar: Rotacionar<br>
                         🖱️ Scroll: Zoom<br>
-                        📏 Distância: <span id="cameraDistance">120</span>mm
+                        📏 Distância: <span id="distanceDisplay">120</span>mm
                     </div>
                 </div>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-label">X</div>
-                    <div class="stat-value" style="color: var(--primary);" id="posX">0.00</div>
+            <div class="stats-bar">
+                <div class="stat-box">
+                    <div class="stat-label">Posição X</div>
+                    <div class="stat-value" style="color: var(--primary);" id="posX">0.00 mm</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">Y</div>
-                    <div class="stat-value" style="color: var(--green);" id="posY">0.00</div>
+                <div class="stat-box">
+                    <div class="stat-label">Posição Y</div>
+                    <div class="stat-value" style="color: var(--green);" id="posY">0.00 mm</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">Z</div>
-                    <div class="stat-value" style="color: var(--purple);" id="posZ">0.00</div>
+                <div class="stat-box">
+                    <div class="stat-label">Posição Z</div>
+                    <div class="stat-value" style="color: var(--purple);" id="posZ">0.00 mm</div>
                 </div>
-                <div class="stat-item">
+                <div class="stat-box">
                     <div class="stat-label">Spindle</div>
-                    <div class="stat-value" style="color: var(--gold);" id="spindle">0</div>
+                    <div class="stat-value" style="color: var(--gold);" id="spindle">0 RPM</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Feed Rate</div>
+                    <div class="stat-value" style="color: var(--accent);" id="feedRate">0 mm/min</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Linha Atual</div>
+                    <div class="stat-value" style="color: var(--white);" id="currentLine">0</div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Modal Exemplos -->
+    <div class="modal" id="examplesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📚 Biblioteca de Exemplos</div>
+                <button class="close-btn" onclick="closeModal('examplesModal')">&times;</button>
+            </div>
+            <div id="examplesContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal Códigos -->
+    <div class="modal" id="codeRefModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📖 Referência de Códigos G e M</div>
+                <button class="close-btn" onclick="closeModal('codeRefModal')">&times;</button>
+            </div>
+            <div id="codeRefContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal Variáveis -->
+    <div class="modal" id="variablesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🔢 Variáveis Ativas</div>
+                <button class="close-btn" onclick="closeModal('variablesModal')">&times;</button>
+            </div>
+            <div id="variablesContent">
+                <p style="text-align: center; color: var(--text-light); padding: 2rem;">
+                    Execute um programa para ver as variáveis ativas.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Exemplo de código G
-        const exampleCode = `; FANUC - Círculo Simples
+        // === CONFIGURAÇÃO INICIAL ===
+        let currentDialect = 'FANUC';
+        let scene, camera, renderer;
+        let cameraDistance = 120;
+        let cameraAngle = { theta: 45, phi: 45 };
+        let isDragging = false;
+        let lastMousePos = { x: 0, y: 0 };
+        let isRunning = false;
+        let currentLineIndex = 0;
+        let toolPathLines = [];
+        let variables = {};
+
+        // Mapeamento G65 FANUC
+        const fanucG65Mapping = {
+            'A': 1, 'B': 2, 'C': 3, 'D': 7, 'E': 8, 'F': 9,
+            'H': 11, 'I': 4, 'J': 5, 'K': 6, 'M': 13, 'Q': 17,
+            'R': 18, 'S': 19, 'T': 20, 'U': 21, 'V': 22, 'W': 23,
+            'X': 24, 'Y': 25, 'Z': 26
+        };
+
+        // === BIBLIOTECA DE EXEMPLOS ===
+        const exampleLibrary = {
+            FANUC: [
+                {
+                    name: 'Quadrado Simples',
+                    category: 'Básico',
+                    description: 'Contorno quadrado 50x50mm',
+                    code: `; FANUC - Quadrado 50x50mm
 G54 G90 G21 G17
 M03 S1500
+
+G00 X-25 Y-25 Z5
+G01 Z-3 F100
+G01 X25 F200
+G01 Y25
+G01 X-25
+G01 Y-25
+G00 Z5
+
+M05
+M30`
+                },
+                {
+                    name: 'Círculo com G02',
+                    category: 'Básico',
+                    description: 'Círculo R30mm usando interpolação',
+                    code: `; FANUC - Círculo R30mm
+G54 G90 G21 G17
+M03 S1800
 
 G00 X30 Y0 Z5
 G01 Z-2 F100
@@ -472,15 +828,155 @@ G02 X30 Y0 I-30 J0 F150
 G00 Z5
 
 M05
-M30`;
+M30`
+                },
+                {
+                    name: 'Macro G65 - Furos em Círculo',
+                    category: 'Paramétrico',
+                    description: 'Padrão circular usando macro',
+                    code: `; FANUC - Macro G65
+#1=40  ; Raio
+#2=6   ; Quantidade
+#3=150 ; Feed
 
-        // Three.js Setup
-        let scene, camera, renderer;
-        let cameraDistance = 120;
-        let cameraAngle = { theta: 45, phi: 45 };
-        let isDragging = false;
-        let lastMousePos = { x: 0, y: 0 };
+G54 G90 G21
+M03 S1200
 
+G65 P1000 A#1 B#2 F#3
+
+M05
+M30
+
+O1000  ; Macro
+; #1=Raio(A), #2=Qtd(B), #9=Feed(F)
+#10=1
+N100
+#11=[360/#2]*#10
+#12=#1*COS[#11]
+#13=#1*SIN[#11]
+
+G00 X[#12] Y[#13] Z5
+G01 Z-5 F[#9]
+G04 P0.5
+G00 Z5
+
+#10=#10+1
+IF[#10LE#2]GOTO100
+M99`
+                }
+            ],
+            SIEMENS: [
+                {
+                    name: 'Retângulo com ROT',
+                    category: 'Básico',
+                    description: 'Contorno com rotação',
+                    code: `; Siemens - ROT
+G54 G90 G71
+M3 S1500
+
+G0 X-25 Y-15 Z5
+G1 Z-2 F100
+G1 X25 F200
+G1 Y15
+G1 X-25
+G1 Y-15
+G0 Z5
+
+ROT X=0 Y=0 Z=45
+
+G0 X-25 Y-15 Z5
+G1 Z-2 F100
+G1 X25 F200
+G1 Y15
+G1 X-25
+G1 Y-15
+G0 Z5
+
+M5
+M30`
+                },
+                {
+                    name: 'Loop REPEAT',
+                    category: 'Paramétrico',
+                    description: 'Linha de furos com REPEAT',
+                    code: `; Siemens - REPEAT
+DEF REAL R1, R2
+DEF INT R3
+R1=15  ; Espaçamento
+R2=6   ; Profundidade
+R3=8   ; Quantidade
+
+G54 G90 G71
+M3 S1200
+
+R10=1
+REPEAT
+  R11=R1 * (R10 - 1)
+  G0 X=R11 Y=0 Z=5
+  G1 Z=-R2 F100
+  G4 S0.5
+  G0 Z=5
+  R10=R10+1
+UNTIL R10 > R3
+
+M5
+M30`
+                }
+            ],
+            HEIDENHAIN: [
+                {
+                    name: 'Contorno Heidenhain',
+                    category: 'Básico',
+                    description: 'Retângulo básico',
+                    code: `; Heidenhain
+FN0: Q1 = 60  ; Largura
+FN0: Q2 = 40  ; Altura
+
+TOOL CALL 1 Z S1500
+
+L X-30 Y-20 Z+5 FMAX
+L Z-3 F100
+L X+30 F200
+L Y+20
+L X-30
+L Y-20
+L Z+5 FMAX
+
+M30`
+                }
+            ],
+            ISO: [
+                {
+                    name: 'Quadrado ISO',
+                    category: 'Básico',
+                    description: 'Contorno padrão ISO',
+                    code: `; ISO Padrão
+G54 G90 G21
+M03 S1500
+
+G00 X-20 Y-20 Z5
+G01 Z-3 F100
+G01 X20 F200
+G01 Y20
+G01 X-20
+G01 Y-20
+G00 Z5
+
+M05
+M30`
+                }
+            ]
+        };
+
+        // === INICIALIZAÇÃO ===
+        document.addEventListener('DOMContentLoaded', () => {
+            init3D();
+            loadExample('FANUC', 0);
+            updateLineNumbers();
+            populateCodeReference();
+        });
+
+        // === THREE.JS ===
         function init3D() {
             const canvas = document.getElementById('canvas3d');
             
@@ -488,8 +984,7 @@ M30`;
             scene.background = new THREE.Color(0x1a1a2e);
 
             camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-            camera.position.set(100, 100, 100);
-            camera.lookAt(0, 0, 0);
+            updateCameraPosition();
 
             renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
             renderer.setSize(canvas.clientWidth, canvas.clientHeight);
@@ -497,6 +992,7 @@ M30`;
             // Luzes
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
+            
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
             directionalLight.position.set(50, 50, 50);
             scene.add(directionalLight);
@@ -533,12 +1029,26 @@ M30`;
             const tool = new THREE.Mesh(toolGeometry, toolMaterial);
             tool.position.set(0, 30, 0);
             tool.rotation.x = Math.PI;
+            tool.name = 'tool';
             scene.add(tool);
+
+            // Ponto de origem
+            const originGeometry = new THREE.SphereGeometry(2, 16, 16);
+            const originMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x00ff00, 
+                emissive: 0x00ff00, 
+                emissiveIntensity: 0.5 
+            });
+            const origin = new THREE.Mesh(originGeometry, originMaterial);
+            origin.position.set(0, 0, 0);
+            origin.name = 'origin';
+            scene.add(origin);
 
             // Mouse events
             canvas.addEventListener('mousedown', onMouseDown);
             canvas.addEventListener('mousemove', onMouseMove);
             canvas.addEventListener('mouseup', onMouseUp);
+            canvas.addEventListener('mouseleave', onMouseUp);
             canvas.addEventListener('wheel', onWheel);
 
             // Resize
@@ -549,7 +1059,10 @@ M30`;
 
         function animate() {
             requestAnimationFrame(animate);
-            
+            renderer.render(scene, camera);
+        }
+
+        function updateCameraPosition() {
             const theta = cameraAngle.theta * Math.PI / 180;
             const phi = cameraAngle.phi * Math.PI / 180;
             
@@ -558,12 +1071,14 @@ M30`;
             camera.position.z = cameraDistance * Math.sin(phi) * Math.sin(theta);
             camera.lookAt(0, 0, 0);
             
-            renderer.render(scene, camera);
+            document.getElementById('distanceDisplay').textContent = cameraDistance.toFixed(0);
         }
 
         function onMouseDown(e) {
-            isDragging = true;
-            lastMousePos = { x: e.clientX, y: e.clientY };
+            if (e.button === 0) {
+                isDragging = true;
+                lastMousePos = { x: e.clientX, y: e.clientY };
+            }
         }
 
         function onMouseMove(e) {
@@ -575,6 +1090,7 @@ M30`;
             cameraAngle.theta += deltaX * 0.5;
             cameraAngle.phi = Math.max(5, Math.min(175, cameraAngle.phi + deltaY * 0.5));
             
+            updateCameraPosition();
             lastMousePos = { x: e.clientX, y: e.clientY };
         }
 
@@ -586,7 +1102,7 @@ M30`;
             e.preventDefault();
             const delta = e.deltaY > 0 ? 10 : -10;
             cameraDistance = Math.max(30, Math.min(300, cameraDistance + delta));
-            document.getElementById('cameraDistance').textContent = cameraDistance.toFixed(0);
+            updateCameraPosition();
         }
 
         function onResize() {
@@ -598,22 +1114,22 @@ M30`;
 
         function zoomIn() {
             cameraDistance = Math.max(30, cameraDistance - 20);
-            document.getElementById('cameraDistance').textContent = cameraDistance.toFixed(0);
+            updateCameraPosition();
         }
 
         function zoomOut() {
             cameraDistance = Math.min(300, cameraDistance + 20);
-            document.getElementById('cameraDistance').textContent = cameraDistance.toFixed(0);
+            updateCameraPosition();
         }
 
         function resetCamera() {
             cameraDistance = 120;
             cameraAngle = { theta: 45, phi: 45 };
-            document.getElementById('cameraDistance').textContent = '120';
+            updateCameraPosition();
         }
 
         function toggleFullscreen() {
-            const viewer = document.querySelector('.viewer-panel');
+            const viewer = document.querySelector('.viewer-section');
             if (!document.fullscreenElement) {
                 viewer.requestFullscreen();
             } else {
@@ -621,25 +1137,272 @@ M30`;
             }
         }
 
+        // === EDITOR ===
         function updateLineNumbers() {
             const editor = document.getElementById('codeEditor');
             const lineNumbers = document.getElementById('lineNumbers');
-            const lines = editor.value.split('\n').length;
-            lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+            const lines = editor.value.split('\n');
+            
+            lineNumbers.innerHTML = lines.map((_, i) => {
+                const num = i + 1;
+                const activeClass = (i === currentLineIndex && isRunning) ? ' active' : '';
+                return `<div class="line-number${activeClass}">${num}</div>`;
+            }).join('');
         }
 
-        function loadExample() {
-            document.getElementById('codeEditor').value = exampleCode;
-            updateLineNumbers();
+        document.getElementById('codeEditor').addEventListener('input', updateLineNumbers);
+        document.getElementById('codeEditor').addEventListener('scroll', () => {
+            document.getElementById('lineNumbers').scrollTop = document.getElementById('codeEditor').scrollTop;
+        });
+
+        // === DIALETOS ===
+        function setDialect(dialect) {
+            currentDialect = dialect;
+            document.getElementById('dialectDisplay').textContent = dialect;
+            
+            document.querySelectorAll('.btn-dialect').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.dialect === dialect) {
+                    btn.classList.add('active');
+                }
+            });
         }
 
-        function saveProgram() {
+        // === EXEMPLOS ===
+        function openExamples() {
+            const modal = document.getElementById('examplesModal');
+            const content = document.getElementById('examplesContent');
+            
+            let html = '';
+            Object.entries(exampleLibrary).forEach(([dialect, examples]) => {
+                html += `
+                    <h3 style="color: var(--primary); margin: 1.5rem 0 1rem 0;">
+                        ${dialect}
+                    </h3>
+                    <div class="examples-grid">
+                `;
+                
+                examples.forEach((example, idx) => {
+                    html += `
+                        <div class="example-card" onclick="loadExample('${dialect}', ${idx})">
+                            <div class="example-category">${example.category}</div>
+                            <div class="example-title">${example.name}</div>
+                            <div class="example-desc">${example.description}</div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            });
+            
+            content.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        function loadExample(dialect, index) {
+            const example = exampleLibrary[dialect][index];
+            if (example) {
+                document.getElementById('codeEditor').value = example.code;
+                document.getElementById('programName').value = example.name;
+                setDialect(dialect);
+                updateLineNumbers();
+                closeModal('examplesModal');
+            }
+        }
+
+        // === CÓDIGOS G/M ===
+        function populateCodeReference() {
+            // Implementação simplificada
+        }
+
+        function openCodeRef() {
+            const modal = document.getElementById('codeRefModal');
+            const content = document.getElementById('codeRefContent');
+            
+            content.innerHTML = `
+                <div class="code-reference">
+                    <div class="code-ref-title">Principais Códigos G:</div>
+                    <div class="code-ref-desc">
+                        <strong style="color: #ff0000;">G00</strong> - Movimento rápido<br>
+                        <strong style="color: #00ff00;">G01</strong> - Interpolação linear<br>
+                        <strong style="color: #00bfff;">G02</strong> - Arco horário<br>
+                        <strong style="color: #00bfff;">G03</strong> - Arco anti-horário<br>
+                        <strong style="color: var(--gold);">G04</strong> - Pausa<br>
+                        <strong style="color: var(--purple);">G17/G18/G19</strong> - Seleção de plano<br>
+                        <strong style="color: var(--green);">G54-G59</strong> - Sistemas de coordenadas<br>
+                        <strong style="color: var(--primary);">G65</strong> - Chamada de macro (FANUC)<br>
+                        <strong style="color: var(--secondary);">G90/G91</strong> - Absoluto/Incremental
+                    </div>
+                </div>
+
+                <div class="code-reference">
+                    <div class="code-ref-title">Principais Códigos M:</div>
+                    <div class="code-ref-desc">
+                        <strong style="color: var(--green);">M03/M04</strong> - Liga spindle<br>
+                        <strong style="color: var(--secondary);">M05</strong> - Desliga spindle<br>
+                        <strong style="color: var(--gold);">M06</strong> - Troca ferramenta<br>
+                        <strong style="color: var(--primary);">M08/M09</strong> - Refrigeração<br>
+                        <strong style="color: var(--purple);">M98/M99</strong> - Subrotina
+                    </div>
+                </div>
+
+                ${currentDialect === 'FANUC' ? `
+                <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid var(--purple); border-radius: 15px; padding: 2rem; margin-top: 1rem;">
+                    <h3 style="color: var(--purple); margin-bottom: 1rem;">Mapeamento G65 - FANUC</h3>
+                    <p style="color: var(--text-light); margin-bottom: 1rem;">
+                        Cada letra na chamada G65 é mapeada para uma variável local:
+                    </p>
+                    <div class="g65-mapping">
+                        ${Object.entries(fanucG65Mapping).map(([letter, varNum]) => `
+                            <div class="mapping-item">
+                                <div class="mapping-letter">${letter}</div>
+                                <div style="color: var(--text-light); font-size: 0.8rem;">→</div>
+                                <div class="mapping-var">#${varNum}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function openVariables() {
+            const modal = document.getElementById('variablesModal');
+            const content = document.getElementById('variablesContent');
+            
+            if (Object.keys(variables).length === 0) {
+                content.innerHTML = `
+                    <p style="text-align: center; color: var(--text-light); padding: 2rem;">
+                        Execute um programa para ver as variáveis ativas.
+                    </p>
+                `;
+            } else {
+                let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">';
+                Object.entries(variables).forEach(([key, value]) => {
+                    html += `
+                        <div style="background: rgba(139, 92, 246, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
+                            <div style="color: var(--purple); font-weight: bold; margin-bottom: 0.5rem; font-family: 'Courier New', monospace;">${key}</div>
+                            <div style="color: var(--primary); font-size: 1.2rem; font-weight: bold;">${value.toFixed(4)}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                content.innerHTML = html;
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // === SIMULAÇÃO ===
+        function runSimulation() {
+            isRunning = true;
+            document.getElementById('runBtn').style.display = 'none';
+            document.getElementById('pauseBtn').style.display = 'inline-flex';
+            
+            // Simulação básica
             const code = document.getElementById('codeEditor').value;
+            const lines = code.split('\n').filter(line => line.trim() && !line.trim().startsWith(';'));
+            
+            currentLineIndex = 0;
+            simulateNextLine(lines);
+        }
+
+        function simulateNextLine(lines) {
+            if (!isRunning || currentLineIndex >= lines.length) {
+                pauseSimulation();
+                return;
+            }
+            
+            const line = lines[currentLineIndex];
+            parseLine(line);
+            
+            updateLineNumbers();
+            document.getElementById('currentLine').textContent = currentLineIndex + 1;
+            
+            currentLineIndex++;
+            
+            setTimeout(() => simulateNextLine(lines), 100);
+        }
+
+        function parseLine(line) {
+            const words = line.match(/[A-Z]-?\d+\.?\d*/g) || [];
+            
+            words.forEach(word => {
+                const letter = word[0];
+                const value = parseFloat(word.slice(1));
+                
+                if (letter === 'X') {
+                    document.getElementById('posX').textContent = value.toFixed(2) + ' mm';
+                    updateToolPosition({ x: value });
+                } else if (letter === 'Y') {
+                    document.getElementById('posY').textContent = value.toFixed(2) + ' mm';
+                    updateToolPosition({ y: value });
+                } else if (letter === 'Z') {
+                    document.getElementById('posZ').textContent = value.toFixed(2) + ' mm';
+                    updateToolPosition({ z: value });
+                } else if (letter === 'F') {
+                    document.getElementById('feedRate').textContent = value.toFixed(0) + ' mm/min';
+                } else if (letter === 'S') {
+                    document.getElementById('spindle').textContent = value.toFixed(0) + ' RPM';
+                }
+            });
+        }
+
+        function updateToolPosition(pos) {
+            const tool = scene.getObjectByName('tool');
+            if (tool) {
+                if (pos.x !== undefined) tool.position.x = pos.x;
+                if (pos.y !== undefined) tool.position.z = pos.y;
+                if (pos.z !== undefined) tool.position.y = pos.z + 20;
+            }
+        }
+
+        function pauseSimulation() {
+            isRunning = false;
+            document.getElementById('runBtn').style.display = 'inline-flex';
+            document.getElementById('pauseBtn').style.display = 'none';
+        }
+
+        function resetSimulation() {
+            pauseSimulation();
+            currentLineIndex = 0;
+            variables = {};
+            
+            document.getElementById('posX').textContent = '0.00 mm';
+            document.getElementById('posY').textContent = '0.00 mm';
+            document.getElementById('posZ').textContent = '0.00 mm';
+            document.getElementById('spindle').textContent = '0 RPM';
+            document.getElementById('feedRate').textContent = '0 mm/min';
+            document.getElementById('currentLine').textContent = '0';
+            
+            updateLineNumbers();
+            
+            // Limpar trajetórias
+            toolPathLines.forEach(line => scene.remove(line));
+            toolPathLines = [];
+            
+            // Reset ferramenta
+            const tool = scene.getObjectByName('tool');
+            if (tool) {
+                tool.position.set(0, 30, 0);
+            }
+        }
+
+        // === ARQUIVO ===
+        function downloadProgram() {
+            const code = document.getElementById('codeEditor').value;
+            const name = document.getElementById('programName').value;
             const blob = new Blob([code], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'programa.nc';
+            a.download = `${name.replace(/\s+/g, '_')}.nc`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -650,31 +1413,29 @@ M30`;
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     document.getElementById('codeEditor').value = e.target.result;
+                    document.getElementById('programName').value = file.name.replace('.nc', '').replace('.txt', '').replace('.gcode', '');
                     updateLineNumbers();
                 };
                 reader.readAsText(file);
             }
         }
 
-        function runSimulation() {
-            alert('Simulação iniciada! (Implementação completa em desenvolvimento)');
-        }
-
-        function pauseSimulation() {
-            alert('Simulação pausada!');
-        }
-
-        function resetSimulation() {
-            document.getElementById('posX').textContent = '0.00';
-            document.getElementById('posY').textContent = '0.00';
-            document.getElementById('posZ').textContent = '0.00';
-            document.getElementById('spindle').textContent = '0';
-        }
-
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', () => {
-            init3D();
-            loadExample();
+        // === ATALHOS DE TECLADO ===
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                downloadProgram();
+            } else if (e.key === 'F5') {
+                e.preventDefault();
+                runSimulation();
+            } else if (e.key === 'Escape') {
+                if (isRunning) {
+                    pauseSimulation();
+                }
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
         });
     </script>
 </body>
